@@ -38,10 +38,15 @@ export default function StoryCard({ story }: { story: Story }) {
           {story.summary}
         </p>
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {story.tags.slice(0, 3).map((t) => (
+        <div className="mt-4 flex flex-wrap items-center gap-1.5">
+          {story.tags.slice(0, 4).map((t) => (
             <TagChip key={t.label} tag={t} />
           ))}
+          {story.tags.length > 4 && (
+            <span className="text-[11px] font-semibold text-slate-400">
+              +{story.tags.length - 4}
+            </span>
+          )}
         </div>
 
         {story.memberOrg && (

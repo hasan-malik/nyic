@@ -7,7 +7,6 @@ import {
   Lock,
   RotateCcw,
   ShieldAlert,
-  Users2,
 } from "lucide-react";
 import Logo from "../../components/Logo";
 import { backendMode } from "../../lib/config";
@@ -17,7 +16,6 @@ import { useStories } from "../../lib/useStories";
 const NAV = [
   { to: "/admin", label: "Overview", icon: BarChart3, end: true },
   { to: "/admin/review", label: "Review queue", icon: ShieldAlert },
-  { to: "/admin/circles", label: "Belonging Circles", icon: Users2 },
   { to: "/admin/activation", label: "Activation", icon: Film },
   { to: "/admin/costs", label: "Cost & budget", icon: DollarSign },
 ];
