@@ -1,18 +1,17 @@
+import { Link } from "react-router-dom";
 import Logo from "./Logo";
 
 const exploreCols = [
   [
-    { label: "Annual Reports", href: "#annual-reports" },
-    { label: "Careers", href: "#careers" },
-    { label: "Organizational Timeline", href: "#timeline" },
-    { label: "Staff", href: "#staff" },
-    { label: "Contact", href: "#contact" },
+    { label: "The story bank", to: "/stories" },
+    { label: "Share a story", to: "/share" },
+    { label: "Legacy voices", to: "/stories" },
+    { label: "NYIC staff console", to: "/admin" },
   ],
   [
-    { label: "Board of Directors", href: "#board" },
-    { label: "Gala 2026", href: "#gala" },
-    { label: "Our Successes", href: "#successes" },
-    { label: "Strategic Plan", href: "#strategic-plan" },
+    { label: "About NYIC", href: "https://www.nyic.org" },
+    { label: "Annual reports", href: "#" },
+    { label: "Take action", href: "#advocate" },
     { label: "Donate", href: "#donate" },
   ],
 ];
@@ -22,16 +21,20 @@ export default function Footer() {
     <footer id="contact" className="bg-navy-deep text-white">
       <div className="mx-auto max-w-container px-6 py-16 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-2">
-          {/* Left: subscribe + contact */}
           <div>
-            <Logo variant="white" />
+            <div className="flex items-center gap-3">
+              <Logo variant="white" />
+              <span className="text-sm font-bold text-brand-gold">
+                #IChooseNY
+              </span>
+            </div>
 
             <h3 className="mt-8 text-2xl font-extrabold tracking-tight">
               Stay in the loop
             </h3>
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-white/75">
-              Subscribe to our email list for updates, action alerts, and
-              stories from across New York.
+              Get a new story each week, plus invitations to Belonging Circle
+              gatherings near you.
             </p>
 
             <form
@@ -64,7 +67,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Right: explore links */}
           <div className="lg:pl-8">
             <h3 className="text-xl font-extrabold tracking-tight">Explore</h3>
             <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-4">
@@ -72,12 +74,21 @@ export default function Footer() {
                 <ul key={i} className="space-y-4">
                   {col.map((link) => (
                     <li key={link.label}>
-                      <a
-                        href={link.href}
-                        className="text-[15px] text-white/80 transition-colors hover:text-white"
-                      >
-                        {link.label}
-                      </a>
+                      {"to" in link ? (
+                        <Link
+                          to={link.to}
+                          className="text-[15px] text-white/80 transition-colors hover:text-white"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          className="text-[15px] text-white/80 transition-colors hover:text-white"
+                        >
+                          {link.label}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -87,8 +98,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 border-t border-white/10 pt-6 text-sm text-white/55">
-          &copy; 2026 New York Immigration Coalition. Recreated layout for
-          preview purposes.
+          &copy; 2026 New York Immigration Coalition · #IChooseNY story
+          ecosystem. Built for the ACF Social Impact Hackathon.
         </div>
       </div>
     </footer>

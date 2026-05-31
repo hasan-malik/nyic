@@ -1,0 +1,168 @@
+import { Link, useParams } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Heart,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import { Container } from "../components/ui/Container";
+import AudioPlayer from "../components/AudioPlayer";
+import TagChip from "../components/TagChip";
+import StoryCard from "../components/StoryCard";
+import { useStory, usePublishedStories } from "../lib/useStories";
+import { similarity } from "../lib/connections";
+
+export default function StoryDetail() {
+  const { id } = useParams();
+  const story = useStory(id);
+  const all = usePublishedStories();
+
+  if (!story) {
+    return (
+      <Container className="py-24 text-center">
+        <p className="text-slate-500">Story not found.</p>
+        <Link to="/stories" className="mt-4 inline-block font-semibold text-brand-red">
+          Back to the story bank
+        </Link>
+      </Container>
+    );
+  }
+
+  // "Stories like this" — powered by the same engine as Belonging Circles.
+  const related = all
+    .filter((s) => s.id !== story.id)
+    .map((s) => ({ s, score: similarity(story, s).score }))
+    .filter((r) => r.score > 0.1)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((r) => r.s);
+
+  return (
+    <div className="bg-white">
+      {/* hero quote */}
+      <section className="bg-navy text-white">
+        <Container className="py-14">
+          <Link
+            to="/stories"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/70 hover:text-white"
+          >
+            <ArrowLeft size={16} /> Back to the bank
+          </Link>
+          <div className="mt-6 max-w-3xl">
+            <Sparkles className="mb-4 text-brand-gold" size={26} />
+            <p className="text-3xl font-extrabold leading-snug sm:text-4xl">
+              "{story.pullQuote}"
+            </p>
+            <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-white/80">
+              <span className="font-semibold text-white">
+                {story.narratorDisplay}
+              </span>
+              <span className="flex items-center gap-1 text-sm">
+                <MapPin size={14} /> {story.location} · from {story.origin}
+              </span>
+              {story.yearsInNY && (
+                <span className="text-sm">· {story.yearsInNY} yrs in NY</span>
+              )}
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      <Container className="grid gap-10 py-12 lg:grid-cols-[1.6fr_1fr]">
+        {/* main */}
+        <div>
+          <AudioPlayer src={story.audioUrl} durationSec={story.durationSec} />
+
+          {story.moderation.sensitive && (
+            <div className="mt-5 flex items-start gap-2.5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+              <ShieldCheck size={18} className="mt-0.5 shrink-0" />
+              <p>
+                This story touches difficult experiences and is shared with the
+                narrator's full consent. If you need support, NYIC's hotline is
+                here for you.
+              </p>
+            </div>
+          )}
+
+          <h2 className="mt-8 text-sm font-bold uppercase tracking-wide text-slate-400">
+            Transcript · {story.language}
+          </h2>
+          <p className="mt-3 whitespace-pre-line text-lg leading-relaxed text-slate-700">
+            {story.transcript}
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-2">
+            {story.tags.map((t) => (
+              <TagChip key={t.label} tag={t} />
+            ))}
+          </div>
+        </div>
+
+        {/* sidebar */}
+        <aside className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-mist p-6">
+            <p className="text-sm font-semibold text-slate-900">
+              Interviewed by
+            </p>
+            <p className="text-slate-600">{story.interviewerName}</p>
+            <p className="mt-4 text-sm font-semibold text-slate-900">
+              How they chose to appear
+            </p>
+            <p className="text-slate-600 capitalize">
+              {story.consent.identity}
+              {story.consent.anonymizeVoice && " · voice masked"}
+            </p>
+            {story.memberOrg && (
+              <>
+                <p className="mt-4 text-sm font-semibold text-slate-900">
+                  Collected via
+                </p>
+                <p className="text-slate-600">{story.memberOrg}</p>
+                <p className="text-xs text-slate-400">NYIC member organization</p>
+              </>
+            )}
+          </div>
+
+          {/* CTA */}
+          <div className="rounded-2xl bg-brand-red p-6 text-white">
+            <Heart size={22} />
+            <p className="mt-3 text-lg font-bold leading-snug">
+              This story belongs to a bigger movement.
+            </p>
+            <Link
+              to={story.cta.href}
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand-red transition-transform hover:scale-105"
+            >
+              {story.cta.label} <ArrowRight size={16} />
+            </Link>
+          </div>
+        </aside>
+      </Container>
+
+      {/* related */}
+      {related.length > 0 && (
+        <section className="bg-mist">
+          <Container className="py-14">
+            <div className="flex items-center gap-2">
+              <Sparkles size={18} className="text-brand-red" />
+              <h2 className="text-xl font-extrabold tracking-tight text-slate-900">
+                Stories that share this thread
+              </h2>
+            </div>
+            <p className="mt-1 text-sm text-slate-500">
+              Surfaced by semantic similarity — the same engine behind our
+              Belonging Circles.
+            </p>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {related.map((s) => (
+                <StoryCard key={s.id} story={s} />
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+    </div>
+  );
+}
