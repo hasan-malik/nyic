@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import {
   BarChart3,
+  DollarSign,
   Film,
   Lock,
   RotateCcw,
@@ -18,6 +19,7 @@ const NAV = [
   { to: "/admin/review", label: "Review queue", icon: ShieldAlert },
   { to: "/admin/circles", label: "Belonging Circles", icon: Users2 },
   { to: "/admin/activation", label: "Activation", icon: Film },
+  { to: "/admin/costs", label: "Cost & budget", icon: DollarSign },
 ];
 
 export default function AdminLayout() {
@@ -110,32 +112,53 @@ export default function AdminLayout() {
 }
 
 function Gate({ onEnter }: { onEnter: () => void }) {
+  const [employeeId, setEmployeeId] = useState("");
+
+  // Frontend-only gate for the demo — anyone who submits is let in. In
+  // production this is Supabase Auth with role-based access (RLS).
+  const signIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    sessionStorage.setItem("nyic_staff", "1");
+    onEnter();
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-navy-ink px-6">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
+      <form
+        onSubmit={signIn}
+        className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl"
+      >
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white">
           <Lock size={24} />
         </div>
-        <h1 className="mt-5 text-xl font-extrabold text-slate-900">
+        <h1 className="mt-5 text-center text-xl font-extrabold text-slate-900">
           NYIC Staff Console
         </h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-center text-sm text-slate-500">
           Story management, moderation, analytics, and community connection
           tools for the #IChooseNY ecosystem.
         </p>
+
+        <label className="mt-6 block text-sm font-semibold text-slate-700">
+          NYIC Employee ID
+        </label>
+        <input
+          value={employeeId}
+          onChange={(e) => setEmployeeId(e.target.value)}
+          placeholder="e.g. NYIC-2041"
+          className="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm focus:border-navy focus:outline-none"
+        />
+
         <button
-          onClick={() => {
-            sessionStorage.setItem("nyic_staff", "1");
-            onEnter();
-          }}
-          className="mt-6 w-full rounded-lg bg-brand-red py-3 font-semibold text-white transition-colors hover:bg-brand-redHover"
+          type="submit"
+          className="mt-5 w-full rounded-lg bg-brand-red py-3 font-semibold text-white transition-colors hover:bg-brand-redHover"
         >
-          Sign in as NYIC staff (demo)
+          Log in
         </button>
-        <p className="mt-3 text-xs text-slate-400">
-          Live deployment uses Supabase Auth with role-based access (RLS).
+        <p className="mt-3 text-center text-xs text-slate-400">
+          Demo: any ID works. Production uses Supabase Auth + role-based access.
         </p>
-      </div>
+      </form>
     </div>
   );
 }

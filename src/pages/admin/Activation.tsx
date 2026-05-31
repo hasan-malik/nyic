@@ -15,8 +15,16 @@ import { store } from "../../lib/store";
 import type { Story } from "../../lib/types";
 
 export default function Activation() {
-  const stories = useStories().filter((s) => s.status === "published");
-  const featured = stories.find((s) => s.featured);
+  const published = useStories().filter((s) => s.status === "published");
+  const featured = published.find((s) => s.featured);
+  // Surface the highest-performing voices (plus anything featured) for the table.
+  const stories = useMemo(() => {
+    const top = [...published]
+      .sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
+      .slice(0, 25);
+    const feat = published.filter((s) => s.featured && !top.includes(s));
+    return [...feat, ...top];
+  }, [published]);
 
   const setFeatured = (s: Story) => {
     stories.forEach((x) => {
@@ -87,6 +95,9 @@ export default function Activation() {
               <th className="hidden px-5 py-3 font-semibold md:table-cell">
                 Sentiment
               </th>
+              <th className="hidden px-5 py-3 font-semibold sm:table-cell">
+                Views
+              </th>
               <th className="px-5 py-3 font-semibold">Runway</th>
               <th className="px-5 py-3 font-semibold">Feature</th>
             </tr>
@@ -104,6 +115,9 @@ export default function Activation() {
                 </td>
                 <td className="hidden px-5 py-3 capitalize text-slate-600 md:table-cell">
                   {s.sentiment}
+                </td>
+                <td className="hidden px-5 py-3 font-medium tabular-nums text-slate-600 sm:table-cell">
+                  {(s.views ?? 0).toLocaleString()}
                 </td>
                 <td className="px-5 py-3">
                   <button

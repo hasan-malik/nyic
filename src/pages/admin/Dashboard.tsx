@@ -1,4 +1,7 @@
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
+  ArrowRight,
   Brain,
   Clock,
   Database,
@@ -25,14 +28,14 @@ import { COST_PER_STORY_CENTS } from "../../lib/pipeline";
 
 export default function Dashboard() {
   const stories = useStories();
-  const stats = dashboardStats(stories);
-  const themes = tagCounts(stories, "theme");
-  const emotions = tagCounts(stories, "emotion");
-  const origins = originBreakdown(stories);
-  const sentiments = sentimentBreakdown(stories);
-  const memberOrgs = memberOrgBreakdown(stories);
-  const words = wordFrequencies(stories, 36);
-  const timeline = collectionByMonth(stories);
+  const stats = useMemo(() => dashboardStats(stories), [stories]);
+  const themes = useMemo(() => tagCounts(stories, "theme"), [stories]);
+  const emotions = useMemo(() => tagCounts(stories, "emotion"), [stories]);
+  const origins = useMemo(() => originBreakdown(stories), [stories]);
+  const sentiments = useMemo(() => sentimentBreakdown(stories), [stories]);
+  const memberOrgs = useMemo(() => memberOrgBreakdown(stories), [stories]);
+  const words = useMemo(() => wordFrequencies(stories, 36), [stories]);
+  const timeline = useMemo(() => collectionByMonth(stories), [stories]);
 
   const monthlySpend = ((stats.total * COST_PER_STORY_CENTS) / 100).toFixed(2);
 
@@ -64,8 +67,11 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* cost callout */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+      {/* cost callout — click through to the full budget breakdown */}
+      <Link
+        to="/admin/costs"
+        className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 transition-colors hover:bg-emerald-100"
+      >
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500 text-white">
             <TrendingUp size={20} />
@@ -80,10 +86,10 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
-        <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-emerald-700">
-          Built for nonprofit budgets
+        <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-emerald-700">
+          View cost breakdown <ArrowRight size={13} />
         </span>
-      </div>
+      </Link>
 
       {/* archive intelligence — narrative synthesis + zero-cost text analytics */}
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">

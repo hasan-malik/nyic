@@ -9,6 +9,7 @@ import Constellation from "./pages/Constellation";
 import Share from "./pages/Share";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
+import CostBreakdown from "./pages/admin/CostBreakdown";
 import ReviewQueue from "./pages/admin/ReviewQueue";
 import Circles from "./pages/admin/Circles";
 import Activation from "./pages/admin/Activation";
@@ -47,6 +48,7 @@ export default function App() {
 
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="costs" element={<CostBreakdown />} />
           <Route path="review" element={<ReviewQueue />} />
           <Route path="circles" element={<Circles />} />
           <Route path="activation" element={<Activation />} />

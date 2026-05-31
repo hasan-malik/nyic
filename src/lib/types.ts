@@ -93,6 +93,8 @@ export interface Story {
   animationStatus: "none" | "queued" | "rendered";
   /** Friends this narrator nominated next (viral loop). */
   nominations: number;
+  /** Public views — used by the dashboard to spot what's resonating. */
+  views?: number;
 
   createdAt: string; // ISO
   /** The call-to-action chosen for this story. */

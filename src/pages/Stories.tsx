@@ -33,7 +33,7 @@ export default function Stories() {
         <Container className="py-14">
           <Eyebrow>The story bank</Eyebrow>
           <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
-            {stories.length} voices and counting
+            {stories.length.toLocaleString()} voices and counting
           </h1>
           <p className="mt-3 max-w-2xl text-white/80">
             Forty years of New Yorkers, in their own words and languages. Search
@@ -91,10 +91,17 @@ export default function Stories() {
           ))}
         </div>
 
+        {/* count */}
+        <p className="mt-6 text-sm text-slate-500">
+          {filtered.length.toLocaleString()}{" "}
+          {filtered.length === 1 ? "story" : "stories"}
+          {filtered.length > 60 && " · showing the 60 most recent"}
+        </p>
+
         {/* grid */}
         {filtered.length > 0 ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((s) => (
+          <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.slice(0, 60).map((s) => (
               <StoryCard key={s.id} story={s} />
             ))}
           </div>

@@ -39,15 +39,24 @@ export function wordFrequencies(stories: Story[], limit = 40): Word[] {
     .slice(0, limit);
 }
 
-/** Collection volume grouped by ISO month label, oldest→newest. */
+/** Collection volume for the last 12 months, chronological. */
 export function collectionByMonth(stories: Story[]): { label: string; count: number }[] {
-  const counts = new Map<string, number>();
+  const counts = new Map<string, number>(); // YYYY-MM -> count
   for (const s of stories) {
     const d = new Date(s.createdAt);
-    const key = d.toLocaleString("en-US", { month: "short", year: "2-digit" });
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
-  return [...counts.entries()]
-    .map(([label, count]) => ({ label, count }))
-    .reverse();
+  // build the last 12 month buckets in order
+  const out: { label: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    out.push({
+      label: d.toLocaleString("en-US", { month: "short" }),
+      count: counts.get(key) ?? 0,
+    });
+  }
+  return out;
 }

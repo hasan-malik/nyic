@@ -1,5 +1,6 @@
 import type { Story } from "./types";
 import { SEED_STORIES } from "./seed";
+import { SYNTHETIC_STORIES } from "./synthetic";
 
 // Tiny localStorage-backed store with a pub/sub so the UI stays in sync.
 // This is the "demo" backend; the live backend (Supabase) mirrors this API.
@@ -48,10 +49,14 @@ export const store = {
     return () => listeners.delete(l);
   },
 
-  /** Stable, memoized, newest-first snapshot. */
+  /**
+   * Stable, memoized, newest-first snapshot. Merges the persisted curated +
+   * user-added stories with the large in-memory synthetic background archive
+   * (synthetic stories are read-only and never persisted).
+   */
   all(): Story[] {
     if (!sortedCache) {
-      sortedCache = [...raw()].sort((a, b) =>
+      sortedCache = [...raw(), ...SYNTHETIC_STORIES].sort((a, b) =>
         b.createdAt.localeCompare(a.createdAt)
       );
     }
@@ -59,7 +64,8 @@ export const store = {
   },
 
   get(id: string): Story | undefined {
-    return raw().find((s) => s.id === id);
+    return raw().find((s) => s.id === id) ??
+      SYNTHETIC_STORIES.find((s) => s.id === id);
   },
 
   add(story: Story) {
