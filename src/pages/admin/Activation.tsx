@@ -198,7 +198,7 @@ function AdvocacyMatch({ stories }: { stories: Story[] }) {
         A bill is moving — find the right voice
       </h3>
       <p className="mt-1 text-sm text-slate-500">
-        Search the consented bank by theme. The consent dial (set in Doorway 4)
+        Search the consented bank by theme. The consent dial (set in the final doorway)
         governs the reciprocal ask — we request inclusion, never assume it.
       </p>
 

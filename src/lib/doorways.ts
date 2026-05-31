@@ -34,6 +34,13 @@ export const DOORWAYS: Doorway[] = [
   },
   {
     n: 4,
+    phase: "Held by the city",
+    question:
+      "Was there a moment someone here — a neighbor, an organizer, a stranger at an NYIC door — made New York feel like yours?",
+    why: "Surfaces the coalition's real impact through a human moment of being chosen — never a testimonial or a 'rate our services.' Belonging is relational, not transactional.",
+  },
+  {
+    n: 5,
     phase: "Hand-back",
     question:
       "What do you want the person across from you to remember about what you just said?",

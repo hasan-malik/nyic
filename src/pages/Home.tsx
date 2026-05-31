@@ -19,7 +19,7 @@ export default function Home() {
         <Container className="relative grid items-center gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
           <div className="animate-fade-up">
             <Eyebrow>New York Immigration Coalition · 40 years</Eyebrow>
-            <h1 className="mt-5 text-5xl font-extrabold leading-[1.04] tracking-tight sm:text-6xl lg:text-[68px]">
+            <h1 className="mt-5 text-[2.1rem] font-extrabold leading-[1.07] tracking-tight sm:text-5xl lg:text-[68px]">
               I Choose New York.
               <br />
               <span className="text-brand-gold">New York Chooses You.</span>

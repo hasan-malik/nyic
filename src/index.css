@@ -17,4 +17,15 @@ body {
   margin: 0;
   background: #ffffff;
   color: #0f172a;
+  /* never let a stray wide element create a horizontal scroll on phones */
+  overflow-x: hidden;
+}
+
+/* Leaflet controls sit above page chrome but below modals/navbars */
+.leaflet-container {
+  z-index: 0;
+}
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400;
 }

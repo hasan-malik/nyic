@@ -103,6 +103,35 @@ export default function AdminLayout() {
 
       {/* content */}
       <main className="flex-1 overflow-x-hidden">
+        {/* mobile staff nav (sidebar is desktop-only) */}
+        <div className="sticky top-0 z-30 flex items-center gap-2 overflow-x-auto border-b border-slate-200 bg-navy-ink px-4 py-2.5 md:hidden">
+          <Link to="/" className="shrink-0">
+            <Logo variant="white" />
+          </Link>
+          <div className="ml-1 flex gap-1.5">
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  `flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                    isActive
+                      ? "bg-white text-navy-ink"
+                      : "bg-white/10 text-white/80"
+                  }`
+                }
+              >
+                <item.icon size={14} /> {item.label}
+                {item.label === "Review queue" && reviewCount > 0 && (
+                  <span className="rounded-full bg-brand-red px-1.5 text-[10px] font-bold text-white">
+                    {reviewCount}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </div>
+        </div>
         <Outlet />
       </main>
     </div>

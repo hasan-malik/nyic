@@ -29,7 +29,6 @@ type Props = {
   emptyTitle: string;
   emptyHint: string;
   unit?: string; // e.g. "voices"
-  height?: number;
 };
 
 // CARTO dark basemap — free, open-source raster tiles (Leaflet · OpenStreetMap · CARTO).
@@ -92,7 +91,6 @@ export default function StoryGeoMap({
   emptyTitle,
   emptyHint,
   unit = "voices",
-  height = 560,
 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const max = useMemo(
@@ -103,10 +101,7 @@ export default function StoryGeoMap({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-      <div
-        className="overflow-hidden rounded-2xl border border-white/10"
-        style={{ height }}
-      >
+      <div className="h-[58vh] max-h-[600px] min-h-[360px] overflow-hidden rounded-2xl border border-white/10">
         <MapContainer
           center={center}
           zoom={zoom}

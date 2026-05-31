@@ -195,11 +195,11 @@ function RecordStep({
         ))}
       </div>
 
-      {/* the four doorways guide */}
+      {/* the doorways guide */}
       <div className="mt-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50/70 to-white p-5">
         <div className="flex items-center justify-between">
           <p className="text-xs font-bold uppercase tracking-wider text-brand-red">
-            Doorway {d.n} of 4 · {d.phase}
+            Doorway {d.n} of {DOORWAYS.length} · {d.phase}
           </p>
           <div className="flex gap-1">
             {DOORWAYS.map((dw, i) => (
@@ -235,8 +235,8 @@ function RecordStep({
             <ArrowLeft size={14} /> Previous
           </button>
           <button
-            onClick={() => setDoorway((i) => Math.min(3, i + 1))}
-            disabled={doorway === 3}
+            onClick={() => setDoorway((i) => Math.min(DOORWAYS.length - 1, i + 1))}
+            disabled={doorway === DOORWAYS.length - 1}
             className="flex items-center gap-1 text-xs font-semibold text-navy disabled:opacity-30"
           >
             Next doorway <ArrowRight size={14} />
@@ -263,7 +263,7 @@ function RecordStep({
             ? "Recording… tap to stop"
             : hasAudio
               ? "Recorded ✓ — tap to re-record"
-              : "Record all four doorways in one take"}
+              : `Record all ${DOORWAYS.length} doorways in one take`}
         </p>
       </div>
 
