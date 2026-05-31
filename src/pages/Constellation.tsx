@@ -8,8 +8,15 @@ import StatewideMap from "../components/maps/StatewideMap";
 import OriginMap from "../components/maps/OriginMap";
 import { usePublishedStories } from "../lib/useStories";
 import { connections } from "../lib/connections";
-import { forceLayout } from "../lib/layout";
+import { clusterGalaxy } from "../lib/layout";
 import type { Story } from "../lib/types";
+
+/** A story's primary theme (ignores the universal "Belonging" when possible). */
+function primaryTheme(s: Story): string {
+  const themes = s.tags.filter((t) => t.category === "theme");
+  const distinct = themes.find((t) => t.label !== "Belonging");
+  return (distinct ?? themes[0])?.label ?? "Belonging";
+}
 
 type View = "threads" | "boroughs" | "statewide" | "origins";
 
@@ -75,16 +82,29 @@ export default function Constellation() {
     return [...featured, ...rest];
   }, [stories]);
 
-  const conns = useMemo(() => connections(nodeStories, 0.18), [nodeStories]);
-  const positions = useMemo(
-    () =>
-      forceLayout(
-        nodeStories.map((s) => s.id),
-        conns.map((c) => ({ a: c.a.id, b: c.b.id, w: c.score })),
-        W,
-        H
-      ),
-    [nodeStories, conns]
+  const conns = useMemo(() => connections(nodeStories, 0.2), [nodeStories]);
+
+  // Group the sampled stories into theme constellations, then lay each out as
+  // its own cluster so the sky reads as distinct "threads" instead of one blob.
+  const clusterGroups = useMemo(() => {
+    const byTheme = new Map<string, Story[]>();
+    for (const s of nodeStories) {
+      const key = primaryTheme(s);
+      const arr = byTheme.get(key);
+      if (arr) arr.push(s);
+      else byTheme.set(key, [s]);
+    }
+    const sorted = [...byTheme.entries()].sort((a, b) => b[1].length - a[1].length);
+    const top = sorted.slice(0, 9);
+    const rest = sorted.slice(9).flatMap(([, v]) => v);
+    const groups = top.map(([key, v]) => ({ key, ids: v.map((s) => s.id) }));
+    if (rest.length) groups.push({ key: "More threads", ids: rest.map((s) => s.id) });
+    return groups;
+  }, [nodeStories]);
+
+  const { pos: positions, clusters } = useMemo(
+    () => clusterGalaxy(clusterGroups, W, H),
+    [clusterGroups]
   );
 
   const dim = (s: Story) => filter !== "all" && s.sentiment !== filter;
@@ -195,11 +215,30 @@ export default function Constellation() {
               </filter>
             </defs>
 
-            {/* edges */}
+            {/* theme cluster labels (the "word-cloud" of threads behind the stars) */}
+            {clusters.map((c) => (
+              <text
+                key={`label-${c.key}`}
+                x={c.cx}
+                y={c.cy}
+                textAnchor="middle"
+                className="fill-white font-extrabold uppercase"
+                style={{
+                  fontSize: 13 + Math.min(22, c.count * 1.4),
+                  opacity: 0.14,
+                  letterSpacing: "0.06em",
+                }}
+              >
+                {c.key}
+              </text>
+            ))}
+
+            {/* edges — only short, local links so each cluster reads as a web */}
             {conns.map((c, i) => {
               const a = positions.get(c.a.id);
               const b = positions.get(c.b.id);
               if (!a || !b) return null;
+              if (Math.hypot(a.x - b.x, a.y - b.y) > 190) return null;
               const active =
                 hover === c.a.id ||
                 hover === c.b.id ||

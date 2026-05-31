@@ -11,6 +11,55 @@ export interface Edge {
   w: number; // 0..1 strength
 }
 
+export interface Cluster {
+  key: string;
+  cx: number;
+  cy: number;
+  count: number;
+}
+
+/**
+ * Deterministic "galaxy" layout: each group (a theme) becomes its own
+ * constellation, spread around the canvas so they never collapse into one
+ * central blob. Cluster centers sit on an alternating ellipse; member stars
+ * spiral out from their center via the golden angle.
+ */
+export function clusterGalaxy(
+  groups: { key: string; ids: string[] }[],
+  width: number,
+  height: number
+): { pos: Map<string, Pt>; clusters: Cluster[] } {
+  const cx = width / 2;
+  const cy = height / 2;
+  const n = groups.length;
+  const pos = new Map<string, Pt>();
+  const clusters: Cluster[] = [];
+
+  groups.forEach((g, i) => {
+    let ccx = cx;
+    let ccy = cy;
+    if (n > 1) {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const alt = i % 2 === 0 ? 1 : 0.56; // two rings so it reads full, not a halo
+      ccx = cx + Math.cos(angle) * width * 0.33 * alt;
+      ccy = cy + Math.sin(angle) * height * 0.36 * alt;
+    }
+    clusters.push({ key: g.key, cx: ccx, cy: ccy, count: g.ids.length });
+
+    const m = g.ids.length;
+    const rMax = Math.min(118, 22 + 13 * Math.sqrt(m));
+    g.ids.forEach((id, k) => {
+      const a = k * 2.39996; // golden angle
+      const r = m <= 1 ? 0 : rMax * Math.sqrt((k + 0.4) / m);
+      const x = Math.max(28, Math.min(width - 28, ccx + r * Math.cos(a)));
+      const y = Math.max(40, Math.min(height - 28, ccy + r * Math.sin(a)));
+      pos.set(id, { x, y });
+    });
+  });
+
+  return { pos, clusters };
+}
+
 export function forceLayout(
   ids: string[],
   edges: Edge[],

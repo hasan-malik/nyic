@@ -59,7 +59,8 @@ create table if not exists public.story_tags (
   id        bigint generated always as identity primary key,
   story_id  uuid not null references public.stories(id) on delete cascade,
   label     text not null,
-  category  text not null check (category in ('emotion','theme','lifeStage','topic'))
+  category  text not null check (category in
+              ('emotion','theme','lifeStage','topic','struggle','heritage','region','org'))
 );
 
 -- friend-interviews-friend viral loop

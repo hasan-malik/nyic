@@ -6,7 +6,9 @@ import {
   Clock,
   Database,
   Globe2,
+  HeartHandshake,
   Languages,
+  LifeBuoy,
   Network,
   Send,
   Sparkles,
@@ -31,6 +33,8 @@ export default function Dashboard() {
   const stats = useMemo(() => dashboardStats(stories), [stories]);
   const themes = useMemo(() => tagCounts(stories, "theme"), [stories]);
   const emotions = useMemo(() => tagCounts(stories, "emotion"), [stories]);
+  const heritage = useMemo(() => tagCounts(stories, "heritage"), [stories]);
+  const struggles = useMemo(() => tagCounts(stories, "struggle"), [stories]);
   const origins = useMemo(() => originBreakdown(stories), [stories]);
   const sentiments = useMemo(() => sentimentBreakdown(stories), [stories]);
   const memberOrgs = useMemo(() => memberOrgBreakdown(stories), [stories]);
@@ -149,6 +153,20 @@ export default function Dashboard() {
         </Panel>
         <Panel title="Sentiment mix" icon={<Sparkles size={16} />}>
           <BarList data={sentiments} color="bg-brand-red" />
+        </Panel>
+        <Panel title="Cultural heritage" icon={<HeartHandshake size={16} />}>
+          <BarList data={heritage} max={8} color="bg-rose-500" />
+          <p className="mt-3 text-[11px] text-slate-400">
+            Diaspora background inferred by Claude from each story — never a
+            box anyone checks.
+          </p>
+        </Panel>
+        <Panel title="Struggles named" icon={<LifeBuoy size={16} />}>
+          <BarList data={struggles} max={8} color="bg-amber-600" />
+          <p className="mt-3 text-[11px] text-slate-400">
+            What people are actually facing — a live needs-assessment for
+            advocacy and services.
+          </p>
         </Panel>
         <Panel title="Countries of origin" icon={<Globe2 size={16} />}>
           <BarList data={origins} max={8} color="bg-emerald-500" />

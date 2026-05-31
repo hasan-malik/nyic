@@ -1,4 +1,5 @@
 import type { Story } from "./types";
+import { deriveContextTags, mergeTags } from "./tags";
 
 // Public-domain sample audio so the player works with zero setup in demo mode.
 // In live mode these are replaced by narrator uploads in Supabase Storage.
@@ -23,7 +24,7 @@ const ctaJoin = { label: "Add your voice", href: "/share" };
 const ctaDonate = { label: "Support NYIC's work", href: "#donate" };
 const ctaAdvocate = { label: "Take action with us", href: "#advocate" };
 
-export const SEED_STORIES: Story[] = [
+const RAW_SEED: Story[] = [
   {
     id: "st_amina",
     memberOrg: "Arab American Association of New York",
@@ -405,3 +406,11 @@ export const SEED_STORIES: Story[] = [
     cta: ctaJoin,
   },
 ];
+
+// Enrich the curated hero stories with the same derived context tags the
+// pipeline adds automatically (cultural heritage, NY region, member org),
+// without re-writing each hand-authored tag list.
+export const SEED_STORIES: Story[] = RAW_SEED.map((s) => ({
+  ...s,
+  tags: mergeTags(s.tags, deriveContextTags(s.origin, s.location, s.memberOrg)),
+}));

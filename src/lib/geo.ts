@@ -300,10 +300,19 @@ export const NY_CITY_POOL: NyCity[] = NY_CITIES.flatMap((c) =>
 // Fast lookup from a "City, NY" location string back to its coord/region.
 const NY_CITY_BY_NAME = new Map(NY_CITIES.map((c) => [c.name, c]));
 
+// Match a location string to a borough (handles "Bronx" vs "The Bronx", etc.).
+const BOROUGH_MATCH: [string, RegExp][] = [
+  ["Manhattan", /manhattan|harlem|chinatown|inwood|washington heights|lower east/i],
+  ["Brooklyn", /brooklyn|flatbush|bushwick|crown heights|bensonhurst|bay ridge|sunset park|brighton/i],
+  ["Queens", /queens|astoria|jackson heights|flushing|elmhurst|corona|woodside|richmond hill|jamaica/i],
+  ["The Bronx", /bronx|fordham|parkchester|soundview|grand concourse|morris heights/i],
+  ["Staten Island", /staten|park hill|tompkinsville|st\.? george|port richmond/i],
+];
+
 /** Borough a story belongs to (NYC only), or null for statewide/upstate. */
 export function boroughOf(location: string): string | null {
-  for (const b of BOROUGHS) {
-    if (location.includes(b)) return b;
+  for (const [name, re] of BOROUGH_MATCH) {
+    if (re.test(location)) return name;
   }
   return null;
 }

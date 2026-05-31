@@ -1,6 +1,15 @@
 import type { Story, StoryTag } from "./types";
 import { SEED_STORIES } from "./seed";
 import { BOROUGHS, NEIGHBORHOODS, NY_CITY_POOL, ORIGIN_POOL } from "./geo";
+import {
+  EMOTION_TAGS,
+  LIFE_STAGES,
+  STRUGGLE_TAGS,
+  THEME_TAGS,
+  TOPIC_TAGS,
+  deriveContextTags,
+  mergeTags,
+} from "./tags";
 
 // Deterministically generates a large, realistic background archive so the
 // counts, maps, and globe feel like a living movement — while the curated seed
@@ -66,40 +75,47 @@ const SENTIMENTS: Story["sentiment"][] = [
   "hopeful", "hopeful", "uplifting", "uplifting", "bittersweet", "somber",
 ];
 
-const THEME_TAGS = [
-  "Belonging", "Family", "Community", "Resilience", "Motherhood", "Legacy",
-  "Work", "Faith", "Women", "Education",
-];
-const TOPIC_TAGS = [
-  "Community", "Small business", "Education", "Detention", "Healthcare",
-  "Housing", "Food", "Language access",
-];
-const LIFE_STAGES = ["Young adult", "Middle age", "Elder", "Youth"];
+// extra mood tags beyond the base sentiment, for richer emotional texture
+const EXTRA_MOODS = EMOTION_TAGS.filter(
+  (m) => !["Hopeful", "Uplifting", "Bittersweet", "Somber"].includes(m)
+);
 
 function pick<T>(rng: () => number, arr: T[]): T {
   return arr[Math.floor(rng() * arr.length)];
 }
 
-function buildTags(rng: () => number, sentiment: Story["sentiment"]): StoryTag[] {
-  const emotion =
-    sentiment === "uplifting"
-      ? "Uplifting"
-      : sentiment === "somber"
-        ? "Somber"
-        : sentiment === "bittersweet"
-          ? "Bittersweet"
-          : "Hopeful";
-  const tags: StoryTag[] = [
+function baseEmotion(sentiment: Story["sentiment"]): string {
+  return sentiment === "uplifting"
+    ? "Uplifting"
+    : sentiment === "somber"
+      ? "Somber"
+      : sentiment === "bittersweet"
+        ? "Bittersweet"
+        : "Hopeful";
+}
+
+// Rich, multi-dimensional tags: two themes, a topic, a struggle, mood(s), a
+// life stage, plus context tags (heritage, NY region, member org).
+function buildSyntheticTags(
+  rng: () => number,
+  origin: string,
+  location: string,
+  memberOrg: string,
+  sentiment: Story["sentiment"]
+): StoryTag[] {
+  const generated: StoryTag[] = [
     { label: "Belonging", category: "theme" },
     { label: pick(rng, THEME_TAGS), category: "theme" },
+    { label: pick(rng, THEME_TAGS), category: "theme" },
     { label: pick(rng, TOPIC_TAGS), category: "topic" },
-    { label: emotion, category: "emotion" },
+    { label: pick(rng, STRUGGLE_TAGS), category: "struggle" },
+    { label: baseEmotion(sentiment), category: "emotion" },
     { label: pick(rng, LIFE_STAGES), category: "lifeStage" },
   ];
-  // de-dupe by label
-  return tags.filter(
-    (t, i) => tags.findIndex((x) => x.label === t.label) === i
-  );
+  if (rng() < 0.5) {
+    generated.push({ label: pick(rng, EXTRA_MOODS), category: "emotion" });
+  }
+  return mergeTags(generated, deriveContextTags(origin, location, memberOrg));
 }
 
 function generate(): Story[] {
@@ -125,6 +141,7 @@ function generate(): Story[] {
     const sentiment = pick(rng, SENTIMENTS);
     const quote = pick(rng, PULL_QUOTES);
     const name = pick(rng, NAMES);
+    const memberOrg = pick(rng, MEMBER_ORGS);
     const track = rng() < 0.25 ? "legacy" : "new";
     // spread creation across the last ~22 months
     const daysAgo = Math.floor(rng() * 670);
@@ -132,7 +149,7 @@ function generate(): Story[] {
 
     out.push({
       id: `syn_${i}`,
-      memberOrg: pick(rng, MEMBER_ORGS),
+      memberOrg,
       track,
       narratorDisplay: name,
       interviewerName: "A friend",
@@ -147,7 +164,7 @@ function generate(): Story[] {
       transcript: `${quote} ${name} shared this in a five-minute interview with a friend, in ${pick(rng, LANGUAGES)}.`,
       summary: quote,
       pullQuote: quote,
-      tags: buildTags(rng, sentiment),
+      tags: buildSyntheticTags(rng, origin, location, memberOrg, sentiment),
       sentiment,
       moderation: { flagged: false, sensitive: false },
       consent: {

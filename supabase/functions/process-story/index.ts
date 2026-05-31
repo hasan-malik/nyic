@@ -75,7 +75,13 @@ Deno.serve(async (req) => {
           `Analyze this immigrant story for the #IChooseNY bank. Return STRICT JSON: ` +
           `{"summary":string (<=18 words),"pull_quote":string (verbatim, most moving sentence),` +
           `"sentiment":"uplifting"|"bittersweet"|"somber"|"hopeful",` +
-          `"tags":[{"label":string,"category":"emotion"|"theme"|"lifeStage"|"topic"}] (4-6 tags)}.\n\n` +
+          `"tags":[{"label":string,"category":"emotion"|"theme"|"topic"|"struggle"|"heritage"|"lifeStage"}]}.\n` +
+          `Tag richly (8-12 tags) across MULTIPLE dimensions so the archive is searchable: ` +
+          `mood/emotion (e.g. Hopeful, Proud, Nostalgic); key themes (Belonging, Motherhood, Faith, Work…); ` +
+          `topic (Small business, Education, Housing…); the central struggle (Detention, Seeking asylum, ` +
+          `Language barrier, Family separation…); and cultural heritage / diaspora background ` +
+          `(e.g. West African, Caribbean, South Asian) inferred respectfully from the story. ` +
+          `Do not invent facts; only tag what the narrator conveys.\n\n` +
           transcript,
       },
     ]);

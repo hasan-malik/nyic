@@ -38,11 +38,29 @@ export interface ConsentSettings {
   allowCampaignUse: boolean;
 }
 
-/** A theme tag produced by Claude Sonnet. */
+/**
+ * A tag produced by Claude Sonnet. The taxonomy is intentionally rich so the
+ * archive is searchable across many dimensions:
+ *  - emotion   : mood / feeling (Hopeful, Proud, Nostalgic…)
+ *  - theme     : key themes (Belonging, Motherhood, Faith…)
+ *  - topic     : subject matter (Small business, Education…)
+ *  - struggle  : the hardship at the heart of the story (Detention, Asylum…)
+ *  - heritage  : cultural / diaspora background (West African, Caribbean…)
+ *  - region    : where in New York (a borough or upstate region)
+ *  - org       : the NYIC member organization that collected it
+ *  - lifeStage : Youth, Young adult, Elder…
+ */
 export interface StoryTag {
   label: string;
-  /** Coarse category used for filtering + analytics. */
-  category: "emotion" | "theme" | "lifeStage" | "topic";
+  category:
+    | "emotion"
+    | "theme"
+    | "lifeStage"
+    | "topic"
+    | "struggle"
+    | "heritage"
+    | "region"
+    | "org";
 }
 
 export interface Story {
