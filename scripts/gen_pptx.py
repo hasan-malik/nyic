@@ -31,13 +31,23 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SHOTS = os.path.join(ROOT, "screenshots")
 OUT = os.path.join(ROOT, "ichooseny-deck.pptx")
 
-# Map semantic keys -> the real (timestamped) screenshot filenames.
+# Map semantic keys -> a unique timestamp substring of the real screenshot
+# filename (the files use a narrow no-break space, so we match loosely).
 IMG = {
-    "stories":       "Screenshot 2026-05-31 at 8.53.29 am.png",  # 3,761 voices bank
-    "dashboard":     "Screenshot 2026-05-31 at 8.54.17 am.png",  # staff console + AI synthesis
-    "origins":       "Screenshot 2026-05-31 at 7.13.07 am.png",  # world origins map
-    "constellation": "Screenshot 2026-05-31 at 8.53.35 am.png",  # kinship galaxy
+    "stories":       "8.53.29",  # "3,761 voices and counting" story bank
+    "dashboard":     "8.54.17",  # staff Overview console + AI synthesis
+    "origins":       "7.13.07",  # world "Every origin. One city." map
+    "constellation": "8.53.35",  # "Every voice. Every thread." kinship galaxy
 }
+
+
+def resolve(key):
+    """Return the absolute path of the screenshot matching key's timestamp."""
+    needle = IMG.get(key, key)
+    for f in os.listdir(SHOTS):
+        if needle in f:
+            return os.path.join(SHOTS, f)
+    raise FileNotFoundError("no screenshot matching %r" % needle)
 
 prs = Presentation()
 prs.slide_width = Inches(13.333)
@@ -91,9 +101,9 @@ def png_size(path):
     return w, h
 
 
-def picture(s, name, l, t, w, h, frame=FRAME):
+def picture(s, key, l, t, w, h, frame=FRAME):
     """Contain a screenshot inside box (l,t,w,h) inches, centered, framed."""
-    path = os.path.join(SHOTS, name)
+    path = resolve(key)
     iw, ih = png_size(path)
     scale = min(w / iw, h / ih)
     pw, ph = iw * scale, ih * scale
@@ -192,15 +202,15 @@ stages = [
     ("STORY COLLECTION EXPERIENCE",
      ["A friend interviews a friend", "5-min audio, any language",
       "QR codes, events, social", "Consent before anything"],
-     "stories.png"),
+     "stories"),
     ("INTERNAL STORY BANK / AI SYSTEM",
      ["Auto-transcribe + translate", "Tagged across 8 dimensions",
       "Search & approve in one console", "~2¢ per story"],
-     "dashboard.png"),
+     "dashboard"),
     ("STORY ACTIVATION & COMMUNITY ACTION",
      ["One story a day → Instagram", "“A bill is moving” → matched stories",
       "Map of all of New York", "Donate · volunteer · testify"],
-     "origins.png"),
+     "origins"),
 ]
 for head, items, shot in stages:
     s = slide(BLACK)
@@ -230,7 +240,7 @@ text(s, 0.9, 3.15, 11.5, 0.7,
      [P(("3,700+ stories", 22, True, YELLOW),
         ("    ·    120+ countries    ·    20 languages    ·    ≈ $79 to process the archive",
          22, False, WHITE))])
-picture(s, "constellation.png", 0.9, 3.95, 11.5, 3.0)
+picture(s, "constellation", 0.9, 3.95, 11.5, 3.0)
 footer(s)
 
 # ===================================================================
